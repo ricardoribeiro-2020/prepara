@@ -15,8 +15,8 @@ PROGRAM prepara
 
   IMPLICIT NONE
 
-  ! Maximum chain length written by sparg (tam_max_cad in sparg/comum.f90).
-  INTEGER, PARAMETER :: tam_max_cad = 20
+  ! Maximum chain length written by sparg — read from cadeias.txt header.
+  INTEGER :: tam_max_cad
 
   ! Maximum number of inter-chain connections per (chain, endpoint).
   ! Must be >= numeroligcad in conducao/comum module (currently 300).
@@ -50,7 +50,8 @@ PROGRAM prepara
 
   ! ---- work variables ----
   INTEGER  :: i, j, kk, mm, nc, mid_idx
-  INTEGER  :: tmp_arr(tam_max_cad), idx_dum
+  INTEGER, ALLOCATABLE :: tmp_arr(:)
+  INTEGER  :: idx_dum
   REAL(KIND=4) :: alf_dum, bet_dum, gam_dum
   REAL(KIND=4) :: x1, y1, z1, dx, dy, dz, d2
   REAL(KIND=4) :: vx, vy, vz, vlen
@@ -95,8 +96,9 @@ PROGRAM prepara
   ENDIF
 
   OPEN(UNIT=1, FILE='cadeias.txt', STATUS='OLD')
-  READ(1,*) Ncad
+  READ(1,*) Ncad, tam_max_cad
   ALLOCATE(first_mon(Ncad), ncad_chain(Ncad))
+  ALLOCATE(tmp_arr(tam_max_cad))
   DO i = 1, Ncad
     READ(1,*) tmp_arr            ! reads exactly tam_max_cad integers
     first_mon(i) = tmp_arr(1)   ! first monomer index of this chain
